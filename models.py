@@ -11,7 +11,7 @@ class BertSentimentClassifier(nn.Module):
         
     def forward(self, input_ids, attention_mask):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        pooled_output = outputs.pooler_output
-        pooled_output = self.dropout(pooled_output)
+        pooled_output = outputs.pooler_output # 取出[CLS]对应的隐藏状态
+        pooled_output = self.dropout(pooled_output) # dropout
         logits = F.sigmoid(self.classifier(pooled_output))
         return logits
