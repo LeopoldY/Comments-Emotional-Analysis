@@ -10,8 +10,8 @@ import time
 isPreprocess = False
 BATCH_SIZE = 32
 EPOCHS = 4
-LEARNING_RATE = 1e-2
-DEVICE = 'cuda'
+LEARNING_RATE = 2e-5
+DEVICE = 'cpu'
 if DEVICE == 'cuda':
     torch.backends.cudnn.benchmark = True
 
@@ -44,12 +44,12 @@ test_dataloader = DataLoader(test_dataset, sampler=SequentialSampler(test_datase
 
 # 模型训练
 device = torch.device(DEVICE)
-model = BertSentimentClassifier(num_classes=2).to(device)
+model = BertSentimentClassifier(num_classes=1).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 epochs = EPOCHS
 total_steps = len(train_dataloader) * epochs
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=total_steps) # 余弦退火学习率
-loss = torch.nn.CrossEntropyLoss().to(device)
+loss = torch.nn.BCELoss().to(device)
 
 def train():
     print(f"trainnig on {device}")
@@ -61,8 +61,6 @@ def train():
     train_accuracy = []
     for epoch in range(epochs):
         print("Epoch:", epoch + 1)
-        total_train_loss = 0
-        total_train_accuracy = 0
         start_time = time.time()
         for step, batch in enumerate(train_dataloader): 
             b_input_ids = batch[0].to(device)
@@ -71,25 +69,23 @@ def train():
             
             model.zero_grad() # 梯度清零
             outputs = model(b_input_ids, b_input_mask) # 前向传播
-            loss_value = loss(outputs, b_labels) # 计算损失
-            total_train_loss += loss_value.item() # 累计损失
-            train_loss.append(loss_value.item())
+            outputs = torch.squeeze(outputs, dim=1)
+            loss_value = loss(outputs, b_labels.float()) # 计算损失
+            train_loss.append(loss_value.item()) # 记录损失
+            
+            optimizer.zero_grad() # 梯度清零
             loss_value.backward() # 反向传播
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0) # 梯度裁剪
+
             optimizer.step() # 更新参数
             scheduler.step() # 更新学习率
             
             logits = outputs.detach().cpu().numpy() # 将输出转移到CPU上
             label_ids = b_labels.to('cpu').numpy() # 将标签转移到CPU上
-            total_train_accuracy += flat_accuracy(logits, label_ids) # 累计准确率
-            train_accuracy.append(flat_accuracy(logits, label_ids))
+            train_accuracy.append(flat_accuracy(logits, label_ids)) # 记录准确率
             
             print("Step:", step, "Loss:", loss_value.item(), "Accuracy:", train_accuracy[-1], end='\r')
-        avg_train_loss = total_train_loss / len(train_dataloader)
-        avg_train_accuracy = total_train_accuracy / len(train_dataloader)
         print()
-        print("Average training loss:", avg_train_loss)
-        print("Average training accuracy:", avg_train_accuracy)
         print("Training epoch took:", time.time() - start_time, "s")
         torch.save(model.state_dict(), "output/BERT_model_epoch_" + str(epoch + 1) + ".pth")
     return train_loss, train_accuracy

@@ -1,7 +1,6 @@
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report, roc_curve   
 
 from utils import ml_preprocess_data, load_data

@@ -10,9 +10,8 @@ def flat_accuracy(preds, labels):
     :param labels: 真实标签
     :return: 准确率
     '''
-    pred_flat = np.argmax(preds, axis=1).flatten()
-    labels_flat = labels.flatten()
-    return np.sum(pred_flat == labels_flat) / len(labels_flat)
+    preds = [1 if pred > 0.5 else 0 for pred in preds]
+    return np.sum(preds == labels) / len(labels)
 
 def load_data(path):
     '''
