@@ -3,7 +3,7 @@ import pandas
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
-from utils import ml_preprocess_data, data_loader
+from utils import ml_preprocess_data, load_data
 
 # data = data_loader("data/online_shopping_10_cats.csv")
 # # 随机选择 1000 条数据进行测试

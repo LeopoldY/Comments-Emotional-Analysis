@@ -3,7 +3,7 @@ from torch.utils.data import TensorDataset, random_split
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
 from models import BertSentimentClassifier
-from utils import preprocess_data, data_loader, flat_accuracy
+from utils import preprocess_data, load_data, flat_accuracy
 
 import time
 
@@ -16,7 +16,7 @@ if DEVICE == 'cuda':
     torch.backends.cudnn.benchmark = True
 
 dataPath = "data/online_shopping_10_cats.csv"
-data = data_loader(dataPath)
+data = load_data(dataPath)
 
 # 数据预处理
 if isPreprocess:

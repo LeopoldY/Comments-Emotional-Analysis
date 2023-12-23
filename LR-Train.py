@@ -4,11 +4,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report, roc_curve   
 
-from utils import ml_preprocess_data, data_loader
+from utils import ml_preprocess_data, load_data
 import matplotlib.pyplot as plt
 
 dataPath = "data/online_shopping_10_cats.csv"
-data = data_loader(dataPath)
+data = load_data(dataPath)
 isPreprocess = False
 
 # 将分词后的文本列表转换为 TF-IDF 特征矩阵

@@ -1,4 +1,4 @@
-from transformers import BertTokenizer, AutoTokenizer
+from transformers import AutoTokenizer
 import torch
 import pandas
 import numpy as np
@@ -14,7 +14,12 @@ def flat_accuracy(preds, labels):
     labels_flat = labels.flatten()
     return np.sum(pred_flat == labels_flat) / len(labels_flat)
 
-def data_loader(path):
+def load_data(path):
+    '''
+    加载数据
+    :param path: 数据路径
+    :return: 数据
+    '''
     data = pandas.read_csv(path, sep=",")
     data = data.dropna() # 去除缺失值
     data = data.drop_duplicates() # 去除重复值
@@ -22,6 +27,12 @@ def data_loader(path):
     return data
 
 def preprocess_data(txt_data, max_length=128):
+    '''
+    数据预处理，用于深度学习模型，使用BERT分词器
+    :param txt_data: 文本数据
+    :param max_length: 最大长度
+    :return: input_ids, attention_masks
+    '''
     tokenizer = AutoTokenizer.from_pretrained('bert-base-chinese')  # 加载中文BERT tokenizer
     
     input_ids = []
@@ -51,6 +62,12 @@ import jieba
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def ml_preprocess_data(txt_data, max_length=128):
+    '''
+    数据预处理, 用于机器学习模型, 用jieba分词并使用tfidf编码
+    :param txt_data: 文本数据
+    :param max_length: 最大长度
+    :return: tfidf_matrix
+    '''
     with open('data/stopwords.txt', 'r', encoding='utf-8') as f:
         stopwords = f.read()
     stopwords = stopwords.split('\n')
