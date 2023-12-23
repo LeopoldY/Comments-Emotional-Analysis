@@ -1,6 +1,18 @@
-from transformers import BertTokenizer
+from transformers import BertTokenizer, AutoTokenizer
 import torch
 import pandas
+import numpy as np
+
+def flat_accuracy(preds, labels):
+    '''
+    计算准确率
+    :param preds: 预测结果
+    :param labels: 真实标签
+    :return: 准确率
+    '''
+    pred_flat = np.argmax(preds, axis=1).flatten()
+    labels_flat = labels.flatten()
+    return np.sum(pred_flat == labels_flat) / len(labels_flat)
 
 def data_loader(path):
     data = pandas.read_csv(path, sep=",")
@@ -10,7 +22,7 @@ def data_loader(path):
     return data
 
 def preprocess_data(txt_data, max_length=128):
-    tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')  # 加载中文BERT tokenizer
+    tokenizer = AutoTokenizer.from_pretrained('bert-base-chinese')  # 加载中文BERT tokenizer
     
     input_ids = []
     attention_masks = []
@@ -38,7 +50,7 @@ def preprocess_data(txt_data, max_length=128):
 import jieba
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-def ml_preprocess_data(txt_data, max_length=512):
+def ml_preprocess_data(txt_data, max_length=128):
     with open('data/stopwords.txt', 'r', encoding='utf-8') as f:
         stopwords = f.read()
     stopwords = stopwords.split('\n')

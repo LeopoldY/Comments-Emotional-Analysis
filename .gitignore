@@ -6,3 +6,8 @@
 /data/input_ids.pt.data
 data/tfidf_matrix.pkl
 data/ml-eval-data.txt
+output/roc_curve.png
+output/svc.pkl
+output/lr.pkl
+output/ml-train-log.txt
+
