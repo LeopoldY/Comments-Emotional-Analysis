@@ -9,13 +9,13 @@ def data_loader(path):
     data = data.reset_index(drop=True) # 重置索引
     return data
 
-def preprocess_data(data, max_length=128):
+def preprocess_data(txt_data, max_length=128):
     tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')  # 加载中文BERT tokenizer
     
     input_ids = []
     attention_masks = []
     
-    for text in data.review:
+    for text in txt_data:
         encoded_text = tokenizer.encode_plus(
             text,  # 输入文本
             add_special_tokens=True,  # 添加特殊标记（[CLS]和[SEP]）
@@ -38,7 +38,7 @@ def preprocess_data(data, max_length=128):
 import jieba
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-def ml_preprocess_data(data):
+def ml_preprocess_data(txt_data, max_length=512):
     with open('data/stopwords.txt', 'r', encoding='utf-8') as f:
         stopwords = f.read()
     stopwords = stopwords.split('\n')
@@ -46,22 +46,16 @@ def ml_preprocess_data(data):
 
     tfidf_matrix = []
     words = []
-    for text in data.review:
-        text = jieba.cut(text)
-        text = [word for word in text if word not in stopwords]
-        words.append(text)
-
-    # 将每个句子的单词列表转换为字符串形式，以空格连接单词
-    text_list = [' '.join(words) for words in words]
-
-    # 初始化 TF-IDF 向量化器
-    tfidf_vectorizer = TfidfVectorizer()
-
-    # 将文本列表转换为 TF-IDF 特征矩阵
-    tfidf_matrix = tfidf_vectorizer.fit_transform(text_list)
-
-    # 将 TF-IDF 特征矩阵转换为稀疏矩阵形式
-    tfidf_matrix_array = tfidf_matrix.toarray()
+    for text in txt_data:
+        word_list = jieba.cut(text)
+        word_list = [word for word in word_list if word not in stopwords]
+            # 如果文本长度不够，用 0 填充
+        if len(word_list) < max_length:
+            word_list.extend(['0'] * (max_length - len(word_list)))
+        words.append(word_list)
+        tfidf_matrix.append(' '.join(word_list))
+    tfidf = TfidfVectorizer(max_features=max_length)
+    tfidf_matrix = tfidf.fit_transform(tfidf_matrix).toarray()
     print('Data preprocessing completed.')
-    return tfidf_matrix_array
+    return tfidf_matrix
 
