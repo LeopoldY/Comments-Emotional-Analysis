@@ -21,7 +21,7 @@ data = data_loader(dataPath)
 
 # 数据预处理
 if isPreprocess:
-    input_ids, attention_masks = preprocess_data(data, max_length=512)
+    input_ids, attention_masks = preprocess_data(data.review.values, max_length=512)
     # 保存预处理后的数据
     torch.save(input_ids, "data/input_ids.pt.data")
     torch.save(attention_masks, "data/attention_masks.pt.data")
