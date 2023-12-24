@@ -49,7 +49,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 epochs = EPOCHS
 total_steps = len(train_dataloader) * epochs
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=total_steps) # 余弦退火学习率
-loss = torch.nn.BCELoss().to(device)
+loss = torch.nn.BCELoss().to(device) # 二分类交叉熵损失函数
 
 def train():
     print(f"trainnig on {device}")
