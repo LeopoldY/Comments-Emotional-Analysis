@@ -11,3 +11,4 @@ output/svc.pkl
 output/lr.pkl
 output/ml-train-log.txt
 
+output/svm.pkl
